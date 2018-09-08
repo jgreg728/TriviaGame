@@ -72,7 +72,7 @@ var marvelQuestions = [
 },
 
 {
-  question: "In Iron Man 3, 'The Mandarin' turned out to be an actor playing the role of Mandarin. What was this (in-movie) actor's name?",
+  question: "In Iron Man 3, 'The Mandarin' turned out to be an actor playing the role of Mandarin. What was this actor's name?",
   correctAnswer: 3,
   choices: [
     "Tobey Slattery",
@@ -125,12 +125,14 @@ var triviaRunning = false;
 var allAnswered = marvelQuestions.length;
 var currentQuestion;
 var index;
+var newArray
 var placeholder = [];
 
 // set START button
 $("#start").on("click", function () {
   console.log("#start");
   $("#start").hide();
+  $("#reset").hide();
   displayQuestion();
   timerGo();
   for(var i = 0; i < marvelQuestions.length; i++) {
@@ -138,7 +140,7 @@ $("#start").on("click", function () {
   }
 })
 
-// each question will have a time limit of 30 seconds to answer each
+// each question will have a time limit of 30 seconds to answer 
 function timerGo(){
 	if (!triviaRunning) {
 	timeInterval = setInterval(decreaseTime, 1000); 
@@ -147,12 +149,12 @@ function timerGo(){
 }
 
 function decreaseTime() {
-	$("#timeDiv").html("<h3>" + timer + "</h3>");
+	$(".timeDiv").html("<h3>" + "Time Remaining: " + timer + "</h3>");
 	timer --;
 	if (timer === 0) {
 		missedAnswers++;
-		stop();
-    $("#answerDiv").html("<p>TIME UP!!! The correct answer is: " + currentQuestion.choices[currentQuestion.correctAnswer] + "</p>");
+		stop(timerGo);
+    $(".answerDiv").html("<p>TIME UP!!! The correct answer is: " + currentQuestion.choices[currentQuestion.correctAnswer] + "</p>");
     checkScore();
   }
 }
@@ -170,35 +172,35 @@ function displayQuestion() {
   currentQuestion = marvelQuestions[index];
 
   // Loop through answer array of each question to print
-  $("#questionDiv").html("<h2>" + currentQuestion.question + "</h2>");
+  $(".questionDiv").html("<h2>" + currentQuestion.question + "</h2>");
 		for(var i = 0; i < currentQuestion.choices.length; i++) {
 			var userChoice = $("<div>");
 			userChoice.addClass("answerchoice");
 			userChoice.html(currentQuestion.choices[i]);
 			//assign array to div so it can check answer
 			userChoice.attr("data-guessvalue", i);
-			$("#answerDiv").append(userChoice);
+      $(".answerDiv").append(userChoice);
     }
   }
 
 // click function to choose answers
-$(".answerchoice").on("click", function () {
+$(".answerchoice").on("click", function() {
 	//get array from userGuess
 	userGuess = parseInt($(this).attr("data-guessvalue"));
 
 	//if else statements depending on CORRECT or INCORRECT answer
 	if (userGuess === currentQuestion.correctAnswer) {
-		stop();
+		stop(timerGo);
 		correctGuesses++;
 		userGuess="";
-    $("#answerblock").html("<p>Correct!</p>");
-    checkScore ();
+    $(".answerDiv").html("<p>Correct!</p>");
+    checkScore();
 
 	} else {
 		stop();
 		incorrectGuesses++;
 		userGuess="";
-    $("#answerDiv").html("<p>That is incorrect. The correct answer is: " + currentQuestion.choices[currentQuestion.correctAnswer] + "</p>");
+    $(".answerDiv").html("<p>That is incorrect. The correct answer is: " + currentQuestion.choices[currentQuestion.correctAnswer] + "</p>");
     checkScore ();
 	}
 })
@@ -207,15 +209,20 @@ $(".answerchoice").on("click", function () {
 // calculate score after player finishes quiz
 
 function checkScore () {
-  var endGame = setTimeout(function() {
-    $("#answerDiv").empty();
+  $(".answerDiv");
+  newArray.push(currentQuestion);
+  marvelQuestions.splice(index,1);
+
+  var endGame = setTimeout (function() {
+    $(".answerDiv").empty();
     timer= 20;
+
   if ((incorrectGuesses + correctGuesses + missedAnswers) === allAnswered) {
-		$("#questionDiv").empty();
-		$("#questionDiv").html("<h3>Game Over!  Here's how you did: </h3>");
-		$("#answerDiv").append("<h4> Correct: " + correctGuesses + "</h4>" );
-		$("#answerDiv").append("<h4> Incorrect: " + incorrectGuesses + "</h4>" );
-		$("#answerDiv").append("<h4> Unanswered: " + missedAnswers + "</h4>" );
+		$(".questionDiv").empty();
+		$(".questionDiv").html("<h3>Game Over!  Here's how you did: </h3>");
+		$(".answerDiv").append("<h4> Correct: " + correctGuesses + "</h4>" );
+		$(".answerDiv").append("<h4> Incorrect: " + incorrectGuesses + "</h4>" );
+		$(".answerDiv").append("<h4> Unanswered: " + missedAnswers + "</h4>" );
 		$("#reset").show();
 		correctGuesses = 0;
 		incorrectGuesses = 0;
@@ -232,8 +239,8 @@ function checkScore () {
 // set RESET button
 $("#reset").on("click", function() {
 	$("#reset").hide();
-	$("#answerDiv").empty();
-	$("#questionDiv").empty();
+	$(".answerDiv").empty();
+	$(".questionDiv").empty();
 	for(var i = 0; i < placeholder.length; i++) {
 		marvelQuestions.push(placeholder[i]);
 	}
@@ -241,4 +248,4 @@ $("#reset").on("click", function() {
 	displayQuestion();
 })
 
-)}
+})
